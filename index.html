@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decision Checklist Generator - Custom Checklists for Any Decision</title>
+    <meta name="description" content="Generate a personalized decision checklist based on your situation. Choose your decision type and get a tailored checklist with actionable items to review before deciding.">
+    <meta property="og:title" content="Decision Checklist Generator - Custom Checklists for Any Decision">
+    <meta property="og:description" content="Free tool to generate personalized decision checklists for investing, career, purchasing, relationships, and more.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://henu-wang.github.io/decision-checklist-generator/">
+    <link rel="canonical" href="https://henu-wang.github.io/decision-checklist-generator/">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={theme:{extend:{colors:{primary:'#0c4a6e',accent:'#0ea5e9',warm:'#f0f9ff'}}}}</script>
+    <style>
+        .type-btn.active { background: #0ea5e9; color: white; border-color: #0ea5e9; }
+        .check-row input:checked + label { color: #94a3b8; text-decoration: line-through; }
+        @media print { header, footer, #generator, .no-print { display: none !important; } #checklist { display: block !important; } }
+    </style>
+</head>
+<body class="bg-white text-gray-800 min-h-screen flex flex-col">
+    <header class="bg-primary text-white">
+        <nav class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+            <a href="index.html" class="text-lg font-bold">Checklist Generator</a>
+            <a href="https://keeprule.com/en/" class="text-sm text-sky-200 hover:text-white" target="_blank" rel="noopener">KeepRule &rarr;</a>
+        </nav>
+    </header>
+
+    <main class="flex-1 max-w-4xl mx-auto px-4 py-10 w-full">
+        <div class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-primary mb-3">Decision Checklist Generator</h1>
+            <p class="text-gray-600 max-w-xl mx-auto">Select your decision type below, customize the parameters, and get a tailored checklist to work through before committing.</p>
+        </div>
+
+        <div id="generator">
+            <h2 class="font-semibold text-sm text-gray-500 uppercase tracking-wider mb-4">Step 1: What type of decision?</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-8">
+                <button onclick="selectType('investment')" class="type-btn border-2 border-gray-200 rounded-xl py-4 px-4 text-center hover:border-accent transition" data-type="investment">
+                    <div class="text-2xl mb-1">&#128200;</div>
+                    <div class="font-medium text-sm">Investment</div>
+                </button>
+                <button onclick="selectType('career')" class="type-btn border-2 border-gray-200 rounded-xl py-4 px-4 text-center hover:border-accent transition" data-type="career">
+                    <div class="text-2xl mb-1">&#128188;</div>
+                    <div class="font-medium text-sm">Career</div>
+                </button>
+                <button onclick="selectType('purchase')" class="type-btn border-2 border-gray-200 rounded-xl py-4 px-4 text-center hover:border-accent transition" data-type="purchase">
+                    <div class="text-2xl mb-1">&#128722;</div>
+                    <div class="font-medium text-sm">Major Purchase</div>
+                </button>
+                <button onclick="selectType('relationship')" class="type-btn border-2 border-gray-200 rounded-xl py-4 px-4 text-center hover:border-accent transition" data-type="relationship">
+                    <div class="text-2xl mb-1">&#129309;</div>
+                    <div class="font-medium text-sm">Relationship</div>
+                </button>
+                <button onclick="selectType('business')" class="type-btn border-2 border-gray-200 rounded-xl py-4 px-4 text-center hover:border-accent transition" data-type="business">
+                    <div class="text-2xl mb-1">&#127970;</div>
+                    <div class="font-medium text-sm">Business</div>
+                </button>
+                <button onclick="selectType('health')" class="type-btn border-2 border-gray-200 rounded-xl py-4 px-4 text-center hover:border-accent transition" data-type="health">
+                    <div class="text-2xl mb-1">&#129657;</div>
+                    <div class="font-medium text-sm">Health</div>
+                </button>
+            </div>
+
+            <div id="step2" class="hidden">
+                <h2 class="font-semibold text-sm text-gray-500 uppercase tracking-wider mb-4">Step 2: Customize</h2>
+                <div class="bg-gray-50 rounded-xl border border-gray-200 p-6 mb-6 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Decision description (optional)</label>
+                        <input type="text" id="decisionDesc" placeholder="e.g., Whether to invest in AAPL" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Stakes level</label>
+                            <select id="stakes" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Reversibility</label>
+                            <select id="reversibility" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30">
+                                <option value="easy">Easily reversible</option>
+                                <option value="partial" selected>Partially reversible</option>
+                                <option value="irreversible">Irreversible</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="generate()" class="w-full bg-accent text-white py-3 rounded-lg font-medium hover:bg-sky-600 transition">Generate My Checklist</button>
+            </div>
+        </div>
+
+        <div id="checklist" class="hidden mt-10">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-primary" id="checklistTitle"></h2>
+                    <p class="text-sm text-gray-500" id="checklistDesc"></p>
+                </div>
+                <div class="flex gap-2 no-print">
+                    <button onclick="window.print()" class="text-xs border border-gray-300 text-gray-600 px-3 py-1.5 rounded hover:bg-gray-100">Print</button>
+                    <button onclick="resetAll()" class="text-xs border border-gray-300 text-gray-600 px-3 py-1.5 rounded hover:bg-gray-100">New Checklist</button>
+                </div>
+            </div>
+            <div class="mb-4">
+                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                    <span id="progressText">0 completed</span>
+                    <span id="progressPct">0%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div id="progressFill" class="bg-accent h-2 rounded-full transition-all" style="width:0%"></div>
+                </div>
+            </div>
+            <div id="checklistContent" class="space-y-6"></div>
+
+            <div class="mt-8 bg-sky-50 rounded-xl p-6 border border-sky-100 text-center no-print">
+                <p class="text-sm text-gray-700 mb-3">Want deeper decision frameworks? Explore curated principles from Buffett, Munger, and other master thinkers.</p>
+                <a href="https://keeprule.com/en/scenarios" class="inline-block bg-accent text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-sky-600 transition" target="_blank" rel="noopener">Browse Decision Scenarios on KeepRule</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="border-t border-gray-200 py-6">
+        <div class="max-w-4xl mx-auto px-4 text-center text-sm text-gray-400">
+            <p>Built with principles from <a href="https://keeprule.com/en/" class="text-accent hover:underline" target="_blank" rel="noopener">KeepRule</a> &middot; Free and open source</p>
+        </div>
+    </footer>
+
+    <script>
+    const checklists = {
+        investment: {
+            title: "Investment Decision Checklist",
+            sections: [
+                { name: "Understanding", items: [
+                    "I can explain how this business makes money in one sentence",
+                    "I understand the industry dynamics and competitive landscape",
+                    "This investment is within my circle of competence",
+                    "I have read at least 2 years of annual reports or financial statements"
+                ]},
+                { name: "Business Quality", items: [
+                    "The business has a durable competitive advantage (moat)",
+                    "Revenue and earnings have been consistent over 5+ years",
+                    "The business generates strong free cash flow",
+                    "The business has pricing power"
+                ]},
+                { name: "Management", items: [
+                    "Management is honest and transparent",
+                    "Management has meaningful ownership (skin in the game)",
+                    "Capital allocation decisions have been rational historically"
+                ]},
+                { name: "Valuation", items: [
+                    "I have estimated intrinsic value independently",
+                    "Current price offers a meaningful margin of safety",
+                    "I am not buying solely because the price dropped"
+                ]},
+                { name: "Risk & Bias Check", items: [
+                    "I have identified the top 3 ways this could fail (inversion)",
+                    "I have sought disconfirming evidence against my thesis",
+                    "I am not acting out of FOMO or herd mentality",
+                    "Position size is appropriate for my portfolio"
+                ]},
+                { name: "Commitment", items: [
+                    "I am prepared to hold this for 5+ years",
+                    "I have defined clear exit criteria in advance",
+                    "I would be comfortable if the market closed for 5 years after buying"
+                ]}
+            ]
+        },
+        career: {
+            title: "Career Decision Checklist",
+            sections: [
+                { name: "Self-Assessment", items: [
+                    "I have identified my core strengths and how this role uses them",
+                    "This aligns with my long-term career goals (5-10 year vision)",
+                    "I am not running away from something; I am running toward something",
+                    "I have assessed my energy level and motivation honestly"
+                ]},
+                { name: "Opportunity Analysis", items: [
+                    "I understand the day-to-day reality of this role (not just the pitch)",
+                    "I have talked to people currently in this role or company",
+                    "The growth trajectory is clear and realistic",
+                    "Compensation is fair relative to market and my needs"
+                ]},
+                { name: "Risk Assessment", items: [
+                    "I can afford the worst-case financial scenario",
+                    "I have a fallback plan if this doesn't work out",
+                    "I have considered the opportunity cost of what I'm giving up",
+                    "I have applied the 10-10-10 test (how will I feel in 10 min, 10 months, 10 years?)"
+                ]},
+                { name: "Bias Check", items: [
+                    "I am not influenced by sunk costs from my current situation",
+                    "I am not anchored to my current salary or title",
+                    "I have considered this from a fresh-start perspective",
+                    "I have slept on this decision for at least 48 hours"
+                ]}
+            ]
+        },
+        purchase: {
+            title: "Major Purchase Checklist",
+            sections: [
+                { name: "Need vs Want", items: [
+                    "I have clearly defined why I need this (not just want)",
+                    "I have waited at least 48 hours since first considering this purchase",
+                    "This purchase aligns with my financial priorities",
+                    "I am not buying this to impress others or for social status"
+                ]},
+                { name: "Financial Assessment", items: [
+                    "I can afford this without dipping into emergency savings",
+                    "I have compared at least 3 alternatives",
+                    "I understand the total cost of ownership (maintenance, insurance, etc.)",
+                    "I have calculated the per-use cost and it seems reasonable"
+                ]},
+                { name: "Research", items: [
+                    "I have read independent reviews (not just marketing)",
+                    "I have checked for common problems or complaints",
+                    "I understand the return/warranty policy",
+                    "I have checked if a used or refurbished version meets my needs"
+                ]},
+                { name: "Timing & Bias", items: [
+                    "I am not buying under time pressure or artificial scarcity",
+                    "I am not anchored to a \"was\" price or fake discount",
+                    "I would still buy this if I discovered it today for the first time"
+                ]}
+            ]
+        },
+        relationship: {
+            title: "Relationship Decision Checklist",
+            sections: [
+                { name: "Values Alignment", items: [
+                    "Our core values are compatible (not just interests)",
+                    "We have discussed long-term expectations openly",
+                    "I accept this person as they are, not who I hope they'll become",
+                    "Our communication styles are compatible or we've found workable compromises"
+                ]},
+                { name: "Honest Assessment", items: [
+                    "I have considered this relationship during calm moments, not just highs or lows",
+                    "I am not staying due to sunk costs (time invested, shared history)",
+                    "I have sought trusted outside perspectives",
+                    "I can clearly articulate what I need and whether this relationship provides it"
+                ]},
+                { name: "Future Orientation", items: [
+                    "I have applied the 10-10-10 test to this decision",
+                    "I have considered how this affects other important relationships",
+                    "I am not making a permanent decision based on temporary emotions",
+                    "I have a realistic (not idealized) view of what comes next"
+                ]}
+            ]
+        },
+        business: {
+            title: "Business Decision Checklist",
+            sections: [
+                { name: "Strategic Fit", items: [
+                    "This aligns with our core mission and long-term strategy",
+                    "I can clearly state the expected outcome and how to measure it",
+                    "This does not distract from our primary competitive advantage",
+                    "The opportunity cost is acceptable (what are we NOT doing instead?)"
+                ]},
+                { name: "Analysis", items: [
+                    "I have gathered data from multiple independent sources",
+                    "I have considered second-order effects (and then what?)",
+                    "I have stress-tested assumptions with pessimistic scenarios",
+                    "I have consulted people who disagree with this direction"
+                ]},
+                { name: "Execution", items: [
+                    "We have the resources and capability to execute this",
+                    "The timeline is realistic with buffer for unexpected delays",
+                    "Roles and responsibilities are clearly defined",
+                    "We have defined clear go/no-go milestones"
+                ]},
+                { name: "Risk & Reversibility", items: [
+                    "I have identified what would make this fail (pre-mortem / inversion)",
+                    "We can reverse or exit this decision if needed",
+                    "Downside is limited and manageable",
+                    "I am not being pressured by urgency bias or groupthink"
+                ]}
+            ]
+        },
+        health: {
+            title: "Health Decision Checklist",
+            sections: [
+                { name: "Information Gathering", items: [
+                    "I have consulted a qualified medical professional",
+                    "I have sought a second opinion for significant decisions",
+                    "I understand the evidence base (not just anecdotes)",
+                    "I have reviewed both benefits and side effects / risks"
+                ]},
+                { name: "Options Evaluation", items: [
+                    "I have considered all available treatment or lifestyle options",
+                    "I understand what happens if I do nothing (baseline comparison)",
+                    "I have asked about success rates and typical outcomes",
+                    "Cost and insurance coverage are factored in"
+                ]},
+                { name: "Personal Context", items: [
+                    "This fits with my lifestyle and I can realistically sustain it",
+                    "I have discussed this with people who will be affected",
+                    "I am not making this decision under panic or extreme emotion",
+                    "I have given myself adequate time to decide (unless emergency)"
+                ]}
+            ]
+        }
+    };
+
+    // High-stakes additions
+    const highStakesItems = [
+        "I have consulted at least one expert or trusted advisor",
+        "I have written down my reasoning for future review (decision journal)",
+        "I have considered what Charlie Munger would say is wrong with this idea"
+    ];
+    const irreversibleItems = [
+        "I have stress-tested this with worst-case scenario analysis",
+        "I am not making this decision under time pressure",
+        "I have built in maximum margin of safety"
+    ];
+
+    let selectedType = null;
+    let totalItems = 0;
+    let checkedItems = {};
+
+    function selectType(type) {
+        selectedType = type;
+        document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector(`[data-type="${type}"]`).classList.add('active');
+        document.getElementById('step2').classList.remove('hidden');
+    }
+
+    function generate() {
+        if (!selectedType) return;
+        const data = JSON.parse(JSON.stringify(checklists[selectedType]));
+        const stakes = document.getElementById('stakes').value;
+        const rev = document.getElementById('reversibility').value;
+        const desc = document.getElementById('decisionDesc').value;
+
+        if (stakes === 'high') {
+            data.sections.push({ name: "High-Stakes Extra Checks", items: [...highStakesItems] });
+        }
+        if (rev === 'irreversible') {
+            data.sections.push({ name: "Irreversibility Safeguards", items: [...irreversibleItems] });
+        }
+
+        document.getElementById('checklistTitle').textContent = data.title;
+        document.getElementById('checklistDesc').textContent = desc ? `Decision: ${desc}` : `Generated ${new Date().toLocaleDateString()}`;
+
+        totalItems = 0;
+        checkedItems = {};
+        let html = '';
+        data.sections.forEach((sec, si) => {
+            html += `<div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div class="px-6 py-3 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+                    <h3 class="font-semibold text-sm">${sec.name}</h3>
+                    <span class="text-xs text-gray-400" id="sc${si}">0/${sec.items.length}</span>
+                </div>
+                <div class="px-6 divide-y divide-gray-100">`;
+            sec.items.forEach((item, ii) => {
+                const key = `${si}-${ii}`;
+                totalItems++;
+                html += `<div class="check-row flex items-start gap-3 py-3">
+                    <input type="checkbox" id="c${key}" onchange="toggle('${key}',${si},${sec.items.length})" class="mt-0.5 w-4 h-4 text-accent rounded border-gray-300 cursor-pointer shrink-0">
+                    <label for="c${key}" class="text-sm cursor-pointer">${item}</label>
+                </div>`;
+            });
+            html += '</div></div>';
+        });
+
+        document.getElementById('checklistContent').innerHTML = html;
+        document.getElementById('generator').classList.add('hidden');
+        document.getElementById('checklist').classList.remove('hidden');
+        updateProgress();
+    }
+
+    function toggle(key, si, sLen) {
+        checkedItems[key] = !checkedItems[key];
+        // Update section count
+        let cnt = 0;
+        for (let i = 0; i < sLen; i++) { if (checkedItems[`${si}-${i}`]) cnt++; }
+        const el = document.getElementById(`sc${si}`);
+        if (el) el.textContent = `${cnt}/${sLen}`;
+        updateProgress();
+    }
+
+    function updateProgress() {
+        const done = Object.values(checkedItems).filter(Boolean).length;
+        const pct = totalItems > 0 ? Math.round((done / totalItems) * 100) : 0;
+        document.getElementById('progressText').textContent = `${done} of ${totalItems} completed`;
+        document.getElementById('progressPct').textContent = `${pct}%`;
+        document.getElementById('progressFill').style.width = `${pct}%`;
+    }
+
+    function resetAll() {
+        selectedType = null;
+        checkedItems = {};
+        document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('step2').classList.add('hidden');
+        document.getElementById('generator').classList.remove('hidden');
+        document.getElementById('checklist').classList.add('hidden');
+        document.getElementById('decisionDesc').value = '';
+    }
+    </script>
+</body>
+</html>
